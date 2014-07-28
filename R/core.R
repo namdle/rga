@@ -5,8 +5,8 @@
 							   end.date = format(Sys.time(), "%Y-%m-%d"), metrics = 'ga:visits',
 							   dimensions = 'ga:date', sort = '', filters = '', segment = '', fields = '', 
 							   start = 1, max, date.format = '%Y-%m-%d', messages = TRUE, batch, walk = FALSE,
-							   output.raw, output.formats, return.url = FALSE, rbr = FALSE, envir = .GlobalEnv) {
-
+							   output.raw, output.formats, return.url = FALSE, rbr = FALSE, samplingLevel = 'higher_precision', envir = .GlobalEnv) {
+                      
 				if (missing(ids)) { stop('please enter a profile id'); }
 
 				if (missing(batch) || batch == FALSE) {
@@ -52,6 +52,7 @@
                			  	 '&dimensions=', dimensions,
                			  	 '&start-index=', start,
                			  	 '&max-results=', max,
+				                 '&samplingLevel=', samplingLevel,
                			  	 sep = '', collapse = '');
   
   				if (sort != '') { url <- paste(url, '&sort=', sort, sep='', collapse=''); }
@@ -101,7 +102,7 @@
 				}
 
 				if (isSampled && walk) {
-					return(.self$getDataInWalks(total = ga.data$totalResults, max = max, batch = batch,
+					return(.self$getDataInWalks(total = ga.data$totalResults, batch = batch,
 											   ids = ids, start.date = start.date, end.date = end.date,
 											   metrics = metrics, dimensions = dimensions, sort = sort,
 											   filters = filters, segment = segment, fields = fields, 
@@ -109,7 +110,7 @@
 				}
 
 				# check if all data is being extracted
-				if (length(ga.data$rows) < ga.data$totalResults && (messages || isBatch)) {
+				if (length(ga.data$rows) < ga.data$totalResults && (messages || isBatch)) {          
 					if (!isBatch) {
 						message(paste('Only pulling', length(ga.data$rows), 'observations of', ga.data$totalResults, 'total (set batch = TRUE to get all observations)'));
 					} else {
